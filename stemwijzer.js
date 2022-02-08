@@ -140,107 +140,114 @@ var buttonNone = document.getElementById("btnNone");
 var buttonSkip = document.getElementById("btnSkip");
 var buttonBack = document.getElementById("btnBack");
 
-var count = 0;
-var countEens = 0;
-var countOneens = 0;
-var countNone = 0;
+var countStatement = 0;
+var countParty = countStatement -1;
 
 //Onload function
 window.onload= AllFunctions();
 
 //All functions
 function AllFunctions(){
+  //Buttons
   buttonEens.onclick = buttonEensClicked;
   buttonOneens.onclick = buttonOneensClicked;
   buttonNone.onclick = buttonNoneClicked;
   buttonSkip.onclick = buttonSkipClicked;
   buttonBack.onclick = buttonBackClicked;
 
-  // var partijen = [subjects.name];
-  // var meningen = [subjects.position];
-  
-  // subjects.position;
-  // subjects.name;
+  var answer = [];
+
+  //Eens
+  function buttonEensClicked(){
+    countStatement++;
+    countParty++;
+
+    title.innerHTML = subjects[countStatement].title;
+    statement.innerHTML = subjects[countStatement].statement;
+
+    console.log("parties: " + subjects[countStatement].parties[countParty].name + ", " + subjects[countStatement].parties[countParty].position);
+
+    if(buttonEensClicked){
+      if(subjects[countStatement].parties[countParty].position == "pro"){
+        answer.push(subjects[countStatement].parties[countParty].name);
+      }
+
+      buttonEens.style.backgroundColor = "rgb(0, 174, 255)";
+      buttonOneens.style.backgroundColor = "maroon";
+      buttonNone.style.backgroundColor = "maroon";
+
+      countResult(countStatement);
+    }
+  }
+
+  //Oneens
+  function buttonOneensClicked(){
+    countStatement++;
+    countParty++;
+
+    title.innerHTML = subjects[countStatement].title;
+    statement.innerHTML = subjects[countStatement].statement;
+
+    console.log("parties: " + subjects[countStatement].parties[countParty].name + ", " + subjects[countStatement].parties[countParty].position);
+    
+    if(buttonOneensClicked){
+      if(subjects[countStatement].parties[countParty].position == "contra"){
+        answer.push(subjects[countStatement].parties[countParty].name);
+      }
+
+      buttonOneens.style.backgroundColor = "rgb(0, 174, 255)"
+      buttonNone.style.backgroundColor = "maroon";
+      buttonEens.style.backgroundColor = "maroon";
+
+      countResult(countStatement);
+    }
+  }
+
+  //Geen van beide
+  function buttonNoneClicked(){
+    countStatement++;
+
+    title.innerHTML = subjects[countStatement].title;
+    statement.innerHTML = subjects[countStatement].statement;
+
+    if(buttonNoneClicked){
+      buttonNone.style.backgroundColor = "rgb(0, 174, 255)";
+      buttonEens.style.backgroundColor = "maroon";
+      buttonOneens.style.backgroundColor = "maroon";
+
+      countResult(countStatement);
+    }
+  }
+
+  //Skip
+  function buttonSkipClicked(){
+    title.innerHTML = subjects[countStatement+1].title;
+    statement.innerHTML = subjects[countStatement+1].statement;
+  }
+
+  //Terug
+  function buttonBackClicked(){
+    title.innerHTML = subjects[countStatement-1].title;
+    statement.innerHTML = subjects[countStatement-1].statement;
+  }
+
+  //Resultaat
+  function countResult(countStatement){
+    if(countStatement == 3){
+      result = answer;
+      Voltooien(result);
+    }
+  }
+  //Voltooid
+  function Voltooien(result){
+    title.innerHTML = ("Resultaat"); 
+    statement.innerHTML = ("De partij die het best bij uw voorkeur past is: " + result); 
+  }
 
   //Default 
   // function defaultSettings(){
   //   buttonEens.style.backgroundColor = "black";
   //   buttonOneens.style.backgroundColor = "black";
   //   buttonNone.style.backgroundColor = "black";
-  // }
-
-  //Eens
-  function buttonEensClicked(){
-    count++;
-    countEens++;
-
-    title.innerHTML = subjects[count].title;
-    statement.innerHTML = subjects[count].statement;
-
-    if(buttonEensClicked){
-      buttonEens.style.backgroundColor = "rgb(0, 174, 255)";
-      buttonOneens.style.backgroundColor = "maroon";
-      buttonNone.style.backgroundColor = "maroon";
-    }
-  }
-
-  //Oneens
-  function buttonOneensClicked(){
-    count++;
-    countOneens++;
-
-    title.innerHTML = subjects[count].title;
-    statement.innerHTML = subjects[count].statement;
-
-    if(buttonOneensClicked){
-      buttonOneens.style.backgroundColor = "rgb(0, 174, 255)"
-      buttonNone.style.backgroundColor = "maroon";
-      buttonEens.style.backgroundColor = "maroon";
-    }
-  }
-
-  //Geen van beide
-  function buttonNoneClicked(){
-    count++;
-    countNone++;
-
-    title.innerHTML = subjects[count].title;
-    statement.innerHTML = subjects[count].statement;
-
-    if(buttonNoneClicked){
-      buttonNone.style.backgroundColor = "rgb(0, 174, 255)";
-      buttonEens.style.backgroundColor = "maroon";
-      buttonOneens.style.backgroundColor = "maroon";
-    }
-  }
-
-  //Skip
-  function buttonSkipClicked(){
-    console.log("$$$$$ " + count);
-    title.innerHTML = subjects[count+1].title;
-    statement.innerHTML = subjects[count+1].statement;
-  }
-
-  //Terug
-  function buttonBackClicked(){
-    console.log("@@@@@ " + count);
-    title.innerHTML = subjects[count-1].title;
-    statement.innerHTML = subjects[count-1].statement;
-  }
-
-  //Resultaat
-  // countResult();
-  // function countResult(){
-  //   total = countEens + countOneens + countNone;
-  //   if(total == 30){
-  //     result = ..;
-  //     Voltooien(result);
-  //   }
-  // }
-
-  //Voltooid
-  // function Voltooien(result){
-  //   title.innerHTML=("Resultaat"); 
-  //   statement.innerHTML=("De partij die het best bij uw voorkeur past is " + result); 
   // }
 }
