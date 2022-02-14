@@ -1,4 +1,4 @@
-//Variables
+//Variables buttons
 var buttonEens = document.getElementById("btnEens");
 var buttonOneens = document.getElementById("btnOneens");
 var buttonNone = document.getElementById("btnNone");
@@ -12,6 +12,7 @@ var answers = [];
 start();
 
 function start(){
+  document.getElementById("group2").style.display = "none";
   title.innerHTML = subjects[countStatement].title;
   statement.innerHTML = subjects[countStatement].statement;
 
@@ -21,6 +22,8 @@ function start(){
   buttonNone.onclick = buttonNoneClicked;
   buttonSkip.onclick = buttonSkipClicked;
   buttonBack.onclick = buttonBackClicked;
+
+  document.getElementById("partijen").onchange = getSelect;
 }
 
 //Function agree button
@@ -90,29 +93,56 @@ function countResult(countStatement){
       Object.entries(result).sort(([,a],[,b]) => b-a)
     );
 
-    var sort = sortable[Object.keys(sortable)[0]];
-    var partij = [parties[sort].name,
-                  /*parties[sort].long*/];
+    const keys = Object.keys(sortable).splice(1, Object.keys(sortable).length);
 
-    const keys = Object.keys(sortable);
-    delete keys[0]; 
-    console.log(keys);
-
-    const endAnswer = partij;
+    const endAnswer =  getKeyByValue(sortable, sortable[Object.keys(sortable)[0]]);
     const endAnswer2 = keys;
 
     Voltooien(endAnswer, endAnswer2);
   }
 }
 
-//Function finished
-function Voltooien(endAnswer, endAnswer2){
-  title.innerHTML = ("Resultaat"); 
-  statement.innerHTML = ("De partij die het best bij uw voorkeur past is: " + endAnswer); 
-  party.innerHTML = ("Overige partijen: " + endAnswer2); 
+//Function to get the end name
+function getKeyByValue(object, value) {
+  return Object.keys(object).find(key => object[key] === value);
 }
 
-// 1. overige partijen ophalen (behalve endAnswer)
-// 2. instellen alleen grote / kleine / seculiere partijen tonen
-// 3. extra gewicht geven aan gekozen categorie
-// 4. styling terugzetten bij gegeven antwoord
+//Function finished
+function Voltooien(endAnswer, endAnswer2){
+  document.getElementById("group2").style.display = "inline";
+  title.innerHTML = ("Resultaat"); 
+  statement.innerHTML = ("De partij die het best bij uw voorkeur past is: " + endAnswer); 
+
+  for(let i = 0; i < endAnswer2.length; i++){
+    const html = document.createElement("li");
+    html.innerText = endAnswer2[i];
+    document.getElementById("result").appendChild(html);
+  }
+}
+
+//Function to choose which parties are shown
+// getSelect();
+function getSelect(){
+  var indexValue = document.getElementById("partijen").options[document.getElementById("partijen").selectedIndex].value;
+  console.log(indexValue);
+
+  if(indexValue == "Grote"){
+    const size = parties.size; 
+    size >= 5;
+    return size;
+  }else if(indexValue == "Kleine"){
+    const size = parties.size; 
+    size < 5;
+    return size;
+  }else if(indexValue == "Seculieren"){
+    const secular = parties.secular; 
+    secular == true;
+    return secular;
+  }else if(indexValue == "Alle"){
+    const all = parties;
+    return all;
+  }
+}
+
+// 1. instellen welke partijen getoond worden
+// 2. extra gewicht geven aan gekozen categorie
