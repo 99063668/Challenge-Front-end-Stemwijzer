@@ -8,13 +8,17 @@ var buttonBack = document.getElementById("btnBack");
 var countStatement = 0;
 var answers = [];
 
-//Onload function
-start();
-
 function start(){
+  document.getElementById("start").style.display = "none";
+  document.getElementById("questions").style.display = "block";
   document.getElementById("group2").style.display = "none";
+
   title.innerHTML = subjects[countStatement].title;
   statement.innerHTML = subjects[countStatement].statement;
+
+  for (let i = 0; i < subjects.length; i++) {
+    answers[i]= new antwoord(null, 1);
+  }
 
   //Buttons
   buttonEens.onclick = buttonEensClicked;
@@ -23,41 +27,28 @@ function start(){
   buttonSkip.onclick = buttonSkipClicked;
   buttonBack.onclick = buttonBackClicked;
 
-  document.getElementById("partijen").onchange = getSelect;
+  document.getElementById("partijen").onchange = function() {countResult();};
 }
-
 //Function agree button
 function buttonEensClicked(){  
   buttonEens.style.backgroundColor = "rgb(0, 174, 255)";
 
-  for(let i = 0; i <= subjects[countStatement].parties.length-1; i++){
-    if(subjects[countStatement].parties[i].position == "pro"){
-      var eens = subjects[countStatement].parties[i].name;
-      answers.push(eens);
-    }
-  }
-
+  answers[countStatement].answer = "pro";
   countStatement++;
 
-  countResult(countStatement);
+  countResult();
   title.innerHTML = subjects[countStatement].title;
   statement.innerHTML = subjects[countStatement].statement;
 }
 
 //Function disagree button
 function buttonOneensClicked(){
-  buttonOneens.style.backgroundColor = "rgb(0, 174, 255)"
+  buttonOneens.style.backgroundColor = "rgb(0, 174, 255)";
 
-  for(let i = 0; i <= subjects[countStatement].parties.length-1; i++){
-    if(subjects[countStatement].parties[i].position == "contra"){
-      var oneens = subjects[countStatement].parties[i].name;
-      answers.push(oneens);
-    }
-  }
-
+  answers[countStatement].answer = "contra";
   countStatement++;
 
-  countResult(countStatement);
+  countResult();
   title.innerHTML = subjects[countStatement].title;
   statement.innerHTML = subjects[countStatement].statement;
 }
@@ -66,28 +57,74 @@ function buttonOneensClicked(){
 function buttonNoneClicked(){
   buttonNone.style.backgroundColor = "rgb(0, 174, 255)";
 
+  answers[countStatement].answer = "none";
+
   countStatement++;
-  countResult(countStatement);
+  countResult();
   title.innerHTML = subjects[countStatement].title;
   statement.innerHTML = subjects[countStatement].statement;
 }
 
 //Function skip button
 function buttonSkipClicked(){
-  title.innerHTML = subjects[countStatement++].title;
-  statement.innerHTML = subjects[countStatement++].statement;
+  countStatement++;
+  title.innerHTML = subjects[countStatement].title;
+  statement.innerHTML = subjects[countStatement].statement;
 }
 
 //Function back button
 function buttonBackClicked(){
-  title.innerHTML = subjects[countStatement--].title;
-  statement.innerHTML = subjects[countStatement--].statement;
+  countStatement--;
+  title.innerHTML = subjects[countStatement].title;
+  statement.innerHTML = subjects[countStatement].statement;
 }
 
 //Function result
-function countResult(countStatement){
+function countResult(){
   if(countStatement >= subjects.length){
-    const result = answers.reduce((acc, curr) => (acc[curr] = (acc[curr] || 0) + 1, acc), {});
+
+    var sameparties = [];
+
+    for(let i = 0; i < subjects.length; i++){
+      for(let j = 0; j < subjects[i].parties.length; j++){
+        console.log(subjects[i].parties[j].position);
+        if(subjects[i].parties[j].position == answers[i].answer){
+          sameparties.push(subjects[i].parties[j]);
+        }
+      }
+    }
+
+    var result = findOcc(sameparties, 'name');
+    const size = 5; 
+    var selectedOption = document.getElementById("partijen").options[document.getElementById("partijen").selectedIndex].value;
+    
+    console.log(result);
+    console.log(selectedOption);
+    if(selectedOption == "Grote"){
+      result = Object.values(result).filter(currentParty => {
+        console.log(currentParty);
+        var partyInfo = parties.find(party => party.name == currentParty);
+        return partyInfo.size >= size;
+      });
+
+      var result2 = Object.values(result).filter(party => {
+        console.log(currentParty);
+        var partyInfo = parties.find(party => party.name == currentParty);
+        return partyInfo.size >= size;
+      });
+      Voltooien(result, result2);
+    }
+    // else if(selectedOption == "Kleine"){
+    //   const result = Object.values(result).filter(party => party.size < size);
+    //   const result2 = Object.values(result).filter(party => party.size < size);
+    //     Voltooien(result, result2);
+    // }else if(selectedOption == "Seculieren"){
+    //   const result = Object.values(result).filter(party => party.secular == true);
+    //   const result2 = Object.values(result).filter(party => party.secular == true);
+    //     Voltooien(result, result2);
+    // }else if(selectedOption == "Alle"){
+    //   Voltooien(result, result2);
+    // }
 
     const sortable = Object.fromEntries(
       Object.entries(result).sort(([,a],[,b]) => b-a)
@@ -110,39 +147,55 @@ function getKeyByValue(object, value) {
 //Function finished
 function Voltooien(endAnswer, endAnswer2){
   document.getElementById("group2").style.display = "inline";
+  document.getElementById("btnEens").style.display = "none";
+  document.getElementById("btnOneens").style.display = "none";
+  document.getElementById("btnNone").style.display = "none";
+  document.getElementById("btnSkip").style.display = "none";
+  document.getElementById("btnBack").style.display = "none";
+
   title.innerHTML = ("Resultaat"); 
   statement.innerHTML = ("De partij die het best bij uw voorkeur past is: " + endAnswer); 
 
   for(let i = 0; i < endAnswer2.length; i++){
     const html = document.createElement("li");
-    html.innerText = endAnswer2[i];
+    console.log(endAnswer2[i]);
+    html.innerText = endAnswer2[i].name;
     document.getElementById("result").appendChild(html);
   }
 }
 
-//Function to choose which parties are shown
-// getSelect();
-function getSelect(){
-  var indexValue = document.getElementById("partijen").options[document.getElementById("partijen").selectedIndex].value;
-  console.log(indexValue);
+function findOcc(arr, key){
+  let arr2 = [];
 
-  if(indexValue == "Grote"){
-    const size = parties.size; 
-    size >= 5;
-    return size;
-  }else if(indexValue == "Kleine"){
-    const size = parties.size; 
-    size < 5;
-    return size;
-  }else if(indexValue == "Seculieren"){
-    const secular = parties.secular; 
-    secular == true;
-    return secular;
-  }else if(indexValue == "Alle"){
-    const all = parties;
-    return all;
+  arr.forEach((x)=>{
+    // check of er een object in de array zit met dezelfde key value
+     if(arr2.some((val)=>{ return val[key] == x[key] })){
+       arr2.forEach((k)=>{
+         if(k[key] === x[key]){
+          k["occurrence"]++
+         }
+      })
+
+     }else{
+      //create object with key and occurrence = 1
+      let a = {}
+      a[key] = x[key]
+      a["occurrence"] = 1
+      arr2.push(a);
+     }
+  })
+  return arr2
+}
+
+class antwoord {
+  answer = null; 
+  weight = 1;
+
+  constructor(answer, weight){
+    this.answer = answer;
+    this.weight = weight;
   }
 }
 
 // 1. instellen welke partijen getoond worden
-// 2. extra gewicht geven aan gekozen categorie
+// 2. extra gewicht geven aan gekozen categorie + dynamisch aanmaken
