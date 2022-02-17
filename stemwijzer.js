@@ -22,7 +22,6 @@ function start(){
       answers[i]= new antwoord(null, 1);
     }
   }
-  console.log(countStatement);
 
   //Buttons
   buttonEens.onclick = buttonEensClicked;
@@ -33,10 +32,19 @@ function start(){
 
   document.getElementById("partijen").onchange = function() {countResult();};
 }
+
+function buttonSettings(buttonId){
+  document.getElementById("btnEens").classList.remove("selectedButton");
+  document.getElementById("btnOneens").classList.remove("selectedButton");
+  document.getElementById("btnNone").classList.remove("selectedButton");
+
+  if(buttonId != null){
+    document.getElementById(buttonId).classList.add("selectedButton");
+  }
+}
+
 //Function agree button
 function buttonEensClicked(){  
-  buttonEens.style.backgroundColor = "rgb(0, 174, 255)";
-
   answers[countStatement].answer = "pro";
 
   countStatement++;
@@ -44,6 +52,16 @@ function buttonEensClicked(){
   if(countStatement < subjects.length) {
     title.innerHTML = subjects[countStatement].title; 
     statement.innerHTML = subjects[countStatement].statement;
+
+    if(answers[countStatement].answer == "pro"){
+      buttonSettings("btnEens");
+    }else if(answers[countStatement].answer == "contra"){
+      buttonSettings("btnOneens");
+    }else if(answers[countStatement].answer == "none"){
+      buttonSettings("btnNone");
+    }else if(answers[countStatement].answer == null){
+      buttonSettings(null);
+    }
   }else{
     countResult();
   }
@@ -51,14 +69,22 @@ function buttonEensClicked(){
 
 //Function disagree button
 function buttonOneensClicked(){
-  buttonOneens.style.backgroundColor = "rgb(0, 174, 255)";
-
   answers[countStatement].answer = "contra";
   countStatement++;
 
   if(countStatement < subjects.length) {
     title.innerHTML = subjects[countStatement].title; 
     statement.innerHTML = subjects[countStatement].statement;
+
+    if(answers[countStatement].answer == "pro"){
+      buttonSettings("btnEens");
+    }else if(answers[countStatement].answer == "contra"){
+      buttonSettings("btnOneens");
+    }else if(answers[countStatement].answer == "none"){
+      buttonSettings("btnNone");
+    }else if(answers[countStatement].answer == null){
+      buttonSettings(null);
+    }
   }else{
     countResult();
   }
@@ -66,14 +92,22 @@ function buttonOneensClicked(){
 
 //Function none button
 function buttonNoneClicked(){
-  buttonNone.style.backgroundColor = "rgb(0, 174, 255)";
-
   answers[countStatement].answer = "none";
   countStatement++;
 
   if(countStatement < subjects.length) {
     title.innerHTML = subjects[countStatement].title; 
     statement.innerHTML = subjects[countStatement].statement;
+
+    if(answers[countStatement].answer == "pro"){
+      buttonSettings("btnEens");
+    }else if(answers[countStatement].answer == "contra"){
+      buttonSettings("btnOneens");
+    }else if(answers[countStatement].answer == "none"){
+      buttonSettings("btnNone");
+    }else if(answers[countStatement].answer == null){
+      buttonSettings(null);
+    }
   }else{
     countResult();
   }
@@ -81,21 +115,42 @@ function buttonNoneClicked(){
 
 //Function skip button
 function buttonSkipClicked(){
+  answers[countStatement].answer = null;
   countStatement++;
   if(countStatement < subjects.length) {
     title.innerHTML = subjects[countStatement].title; 
     statement.innerHTML = subjects[countStatement].statement;
+
+    if(answers[countStatement].answer == "pro"){
+      buttonSettings("btnEens");
+    }else if(answers[countStatement].answer == "contra"){
+      buttonSettings("btnOneens");
+    }else if(answers[countStatement].answer == "none"){
+      buttonSettings("btnNone");
+    }else if(answers[countStatement].answer == null){
+      buttonSettings(null);
+    }
   }else{
     countResult();
   }
 }
 
 //Function back button
-function buttonBackClicked(){
+function buttonBackClicked(){ 
   if(countStatement > 0){
     countStatement--;
     title.innerHTML = subjects[countStatement].title; 
     statement.innerHTML = subjects[countStatement].statement;
+
+    if(answers[countStatement].answer == "pro"){
+      buttonSettings("btnEens");
+    }else if(answers[countStatement].answer == "contra"){
+      buttonSettings("btnOneens");
+    }else if(answers[countStatement].answer == "none"){
+      buttonSettings("btnNone");
+    }else if(answers[countStatement].answer == null){
+      buttonSettings(null);
+    }
   }
 }
 
@@ -158,20 +213,18 @@ function Voltooien(endAnswer){
   document.getElementById("btnSkip").style.display = "none";
   document.getElementById("btnBack").style.display = "none";
 
-  if(endAnswer.length == 0){
-    document.getElementById("group2").style.display = "none";
+  title.innerHTML = "Resultaat"; 
 
-    title.innerHTML = "Resultaat"; 
+  if(endAnswer.length == 0){
     statement.innerHTML = "Geen partijen gevonden die overeen komen met uw keuzes."; 
   }else{
-    title.innerHTML = "Resultaat"; 
-    statement.innerHTML = "De partij die het best bij uw voorkeur past is: " + endAnswer[0].name + ", u heeft " + endAnswer[0].occurrence + "keer eens gestemd"; 
+    statement.innerHTML = "De partij die het best bij uw voorkeur past is: " + endAnswer[0].name + ", u heeft " + endAnswer[0].occurrence + " keer eens gestemd"; 
 
     document.getElementById("result").textContent = "";
 
     for(let i = 1; i < endAnswer.length; i++){
       const html = document.createElement("li");
-      html.innerText = endAnswer[i].name + ", u heeft " + endAnswer[i].occurrence + "keer eens gestemd";
+      html.innerText = endAnswer[i].name + ", u heeft " + endAnswer[i].occurrence + " keer eens gestemd";
       html.id = "lijstElement_" + i;
       document.getElementById("result").appendChild(html);
     }
