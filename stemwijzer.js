@@ -12,13 +12,17 @@ function start(){
   document.getElementById("start").style.display = "none";
   document.getElementById("questions").style.display = "block";
   document.getElementById("group2").style.display = "none";
+  document.getElementById("options").style.display = "none";
 
   title.innerHTML = subjects[countStatement].title;
   statement.innerHTML = subjects[countStatement].statement;
 
-  for (let i = 0; i < subjects.length; i++) {
-    answers[i]= new antwoord(null, 1);
+  if(answers.length == 0){
+    for (let i = 0; i < subjects.length; i++) {
+      answers[i]= new antwoord(null, 1);
+    }
   }
+  console.log(countStatement);
 
   //Buttons
   buttonEens.onclick = buttonEensClicked;
@@ -34,11 +38,15 @@ function buttonEensClicked(){
   buttonEens.style.backgroundColor = "rgb(0, 174, 255)";
 
   answers[countStatement].answer = "pro";
+
   countStatement++;
 
-  countResult();
-  title.innerHTML = subjects[countStatement].title;
-  statement.innerHTML = subjects[countStatement].statement;
+  if(countStatement < subjects.length) {
+    title.innerHTML = subjects[countStatement].title; 
+    statement.innerHTML = subjects[countStatement].statement;
+  }else{
+    countResult();
+  }
 }
 
 //Function disagree button
@@ -48,9 +56,12 @@ function buttonOneensClicked(){
   answers[countStatement].answer = "contra";
   countStatement++;
 
-  countResult();
-  title.innerHTML = subjects[countStatement].title;
-  statement.innerHTML = subjects[countStatement].statement;
+  if(countStatement < subjects.length) {
+    title.innerHTML = subjects[countStatement].title; 
+    statement.innerHTML = subjects[countStatement].statement;
+  }else{
+    countResult();
+  }
 }
 
 //Function none button
@@ -58,84 +69,78 @@ function buttonNoneClicked(){
   buttonNone.style.backgroundColor = "rgb(0, 174, 255)";
 
   answers[countStatement].answer = "none";
-
   countStatement++;
-  countResult();
-  title.innerHTML = subjects[countStatement].title;
-  statement.innerHTML = subjects[countStatement].statement;
+
+  if(countStatement < subjects.length) {
+    title.innerHTML = subjects[countStatement].title; 
+    statement.innerHTML = subjects[countStatement].statement;
+  }else{
+    countResult();
+  }
 }
 
 //Function skip button
 function buttonSkipClicked(){
   countStatement++;
-  title.innerHTML = subjects[countStatement].title;
-  statement.innerHTML = subjects[countStatement].statement;
+  if(countStatement < subjects.length) {
+    title.innerHTML = subjects[countStatement].title; 
+    statement.innerHTML = subjects[countStatement].statement;
+  }else{
+    countResult();
+  }
 }
 
 //Function back button
 function buttonBackClicked(){
-  countStatement--;
-  title.innerHTML = subjects[countStatement].title;
-  statement.innerHTML = subjects[countStatement].statement;
+  if(countStatement > 0){
+    countStatement--;
+    title.innerHTML = subjects[countStatement].title; 
+    statement.innerHTML = subjects[countStatement].statement;
+  }
 }
 
 //Function result
 function countResult(){
-  if(countStatement >= subjects.length){
+  var sameparties = [];
 
-    var sameparties = [];
-
-    for(let i = 0; i < subjects.length; i++){
-      for(let j = 0; j < subjects[i].parties.length; j++){
-        console.log(subjects[i].parties[j].position);
+  for(let i = 0; i < subjects.length; i++){
+    for(let j = 0; j < subjects[i].parties.length; j++){
+      for(let o = 0; o < answers[i].weight; o++){
         if(subjects[i].parties[j].position == answers[i].answer){
           sameparties.push(subjects[i].parties[j]);
         }
       }
     }
+  }
 
-    var result = findOcc(sameparties, 'name');
-    const size = 5; 
-    var selectedOption = document.getElementById("partijen").options[document.getElementById("partijen").selectedIndex].value;
-    
-    console.log(result);
-    console.log(selectedOption);
-    if(selectedOption == "Grote"){
-      result = Object.values(result).filter(currentParty => {
-        console.log(currentParty);
-        var partyInfo = parties.find(party => party.name == currentParty);
-        return partyInfo.size >= size;
-      });
+  var result = findOcc(sameparties, 'name');
+  const size = 5; 
+  var selectedOption = document.getElementById("partijen").options[document.getElementById("partijen").selectedIndex].value;
+  
+  result.sort(function(a, b) {
+    return b.occurrence - a.occurrence;
+  });
 
-      var result2 = Object.values(result).filter(party => {
-        console.log(currentParty);
-        var partyInfo = parties.find(party => party.name == currentParty);
-        return partyInfo.size >= size;
-      });
-      Voltooien(result, result2);
-    }
-    // else if(selectedOption == "Kleine"){
-    //   const result = Object.values(result).filter(party => party.size < size);
-    //   const result2 = Object.values(result).filter(party => party.size < size);
-    //     Voltooien(result, result2);
-    // }else if(selectedOption == "Seculieren"){
-    //   const result = Object.values(result).filter(party => party.secular == true);
-    //   const result2 = Object.values(result).filter(party => party.secular == true);
-    //     Voltooien(result, result2);
-    // }else if(selectedOption == "Alle"){
-    //   Voltooien(result, result2);
-    // }
-
-    const sortable = Object.fromEntries(
-      Object.entries(result).sort(([,a],[,b]) => b-a)
-    );
-
-    const keys = Object.keys(sortable).splice(1, Object.keys(sortable).length);
-
-    const endAnswer =  getKeyByValue(sortable, sortable[Object.keys(sortable)[0]]);
-    const endAnswer2 = keys;
-
-    Voltooien(endAnswer, endAnswer2);
+  if(selectedOption == "Grote"){
+    result = result.filter(currentParty => {
+      var partyInfo = parties.find(party => party.name == currentParty.name);
+      return partyInfo.size >= size;
+    });
+    Voltooien(result);
+  // }else if(selectedOption == "Kleine"){
+  //   result = result.filter(currentParty => {
+  //     var partyInfo = parties.find(party => party.name == currentParty.name);
+  //     return partyInfo.size < size;
+  //   });
+  //   Voltooien(result);
+  }else if(selectedOption == "Seculieren"){
+    result = result.filter(currentParty => {
+      var partyInfo = parties.find(party => party.name == currentParty.name);
+      return partyInfo.secular == true;
+    });
+    Voltooien(result);
+  }else if(selectedOption == "Alle"){  
+    Voltooien(result);
   }
 }
 
@@ -145,7 +150,7 @@ function getKeyByValue(object, value) {
 }
 
 //Function finished
-function Voltooien(endAnswer, endAnswer2){
+function Voltooien(endAnswer){
   document.getElementById("group2").style.display = "inline";
   document.getElementById("btnEens").style.display = "none";
   document.getElementById("btnOneens").style.display = "none";
@@ -153,14 +158,23 @@ function Voltooien(endAnswer, endAnswer2){
   document.getElementById("btnSkip").style.display = "none";
   document.getElementById("btnBack").style.display = "none";
 
-  title.innerHTML = ("Resultaat"); 
-  statement.innerHTML = ("De partij die het best bij uw voorkeur past is: " + endAnswer); 
+  if(endAnswer.length == 0){
+    document.getElementById("group2").style.display = "none";
 
-  for(let i = 0; i < endAnswer2.length; i++){
-    const html = document.createElement("li");
-    console.log(endAnswer2[i]);
-    html.innerText = endAnswer2[i].name;
-    document.getElementById("result").appendChild(html);
+    title.innerHTML = "Resultaat"; 
+    statement.innerHTML = "Geen partijen gevonden die overeen komen met uw keuzes."; 
+  }else{
+    title.innerHTML = "Resultaat"; 
+    statement.innerHTML = "De partij die het best bij uw voorkeur past is: " + endAnswer[0].name + ", u heeft " + endAnswer[0].occurrence + "keer eens gestemd"; 
+
+    document.getElementById("result").textContent = "";
+
+    for(let i = 1; i < endAnswer.length; i++){
+      const html = document.createElement("li");
+      html.innerText = endAnswer[i].name + ", u heeft " + endAnswer[i].occurrence + "keer eens gestemd";
+      html.id = "lijstElement_" + i;
+      document.getElementById("result").appendChild(html);
+    }
   }
 }
 
@@ -168,21 +182,18 @@ function findOcc(arr, key){
   let arr2 = [];
 
   arr.forEach((x)=>{
-    // check of er een object in de array zit met dezelfde key value
-     if(arr2.some((val)=>{ return val[key] == x[key] })){
-       arr2.forEach((k)=>{
-         if(k[key] === x[key]){
-          k["occurrence"]++
-         }
-      })
-
-     }else{
-      //create object with key and occurrence = 1
-      let a = {}
-      a[key] = x[key]
-      a["occurrence"] = 1
-      arr2.push(a);
-     }
+    if(arr2.some((val)=>{ return val[key] == x[key] })){
+      arr2.forEach((k)=>{
+      if(k[key] === x[key]){
+        k["occurrence"]++
+      }
+    })
+    }else{
+    let a = {}
+    a[key] = x[key]
+    a["occurrence"] = 1
+    arr2.push(a);
+    }
   })
   return arr2
 }
@@ -197,5 +208,35 @@ class antwoord {
   }
 }
 
-// 1. instellen welke partijen getoond worden
-// 2. extra gewicht geven aan gekozen categorie + dynamisch aanmaken
+//Add options
+function options(){
+  document.getElementById("titleOption").style.display = "block";
+  document.getElementById("optionBtn").style.display = "none";
+
+  for(let i = 0; i < subjects.length; i++){
+    answers[i]= new antwoord(null, 1);
+
+    var ul = document.getElementById('option');
+    var li = document.createElement('li');
+
+    li.id = "extraVoorkeur" + i;
+
+    var checkbox = document.createElement('input');
+    checkbox.type = "checkbox";
+    checkbox.id = "checkbox" + i;
+    checkbox.onchange = function() {
+      if(this.checked){
+        answers[i].weight = 2;
+      }else{
+        answers[i].weight = 1;
+      }
+      console.log(answers[i].weight);
+    };
+    
+    li.appendChild(checkbox);
+    
+    var text = subjects[i].title;
+    li.appendChild(document.createTextNode(text));
+    ul.appendChild(li); 
+  }
+}

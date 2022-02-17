@@ -10,19 +10,25 @@
       <div class="pages">
         <header>
           <div class="header-image">
-            <a class="backBtn" href="index.html">Home</a>
+            <img src="images/logo.PNG">
             <h1><b>Stemwijzer Tweede Kamer 2022</b></h1>
+            <h2 style="color:rgb(0, 174, 255)"><b>Test uw politieke voorkeur aan de hand van 30 stellingen</b></h2>
           </div>
         </header>
 
         <div id="start">
-          <div class="grid-container">
-            <!-- <a class="startBtn" href="onderwerpen.html">Start</a> -->
+          <div class="">
             <button id="startBtn" class="startBtn" onclick="start()">Start</button>
+            <button id="optionBtn" class="startBtn" onclick="options()">Instellingen</button>
           </div>
         </div>
+
+        <div id="options">
+          <h2 id="titleOption" style="display: none;">Extra belangrijke onderwerpen</h2>
+          <ul id="option"></ul>
+        </div>
   
-        <div id="questions" style="display: none;">
+        <main id="questions" style="display: none;">
           <div>
             <button class="back" id="btnBack"><strong><-</strong></button>
           </div>
@@ -37,7 +43,7 @@
                 <select name="partijen" id="partijen">
                   <option value="Alle" selected>Alle partijen</option>
                   <option value="Grote">Grote partijen</option>
-                  <option value="Kleine">Kleine partijen</option>
+                  <!-- <option value="Kleine">Kleine partijen</option> -->
                   <option value="Seculieren">Seculieren partijen</option>
                 </select>
               </fieldset> 
@@ -50,7 +56,7 @@
               <button class="skip" id="btnSkip"><strong>Sla deze vraag over -></strong></button>
             </div>
           </div>
-        </div>  
+        </main>  
       </div>
       
       <footer>
